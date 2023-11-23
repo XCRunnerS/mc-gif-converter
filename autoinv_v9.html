@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>MC GIF Porter V9</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="A bit hard to use; meant for those who know what they're doing." />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://unpkg.com/gif-frames@0.4.0/dist/gif-frames.min.js"></script>
+    <style>
+        .warn {
+            color: yellow;
+        }
+        body {
+            height: 100%;
+            padding: 0;
+            margin: 0;
+            background: black;
+            color: white;
+            font-family: 'Open Sans', sans-serif;
+        }
+        input {
+            all: unset;
+            background: #222;
+            color: white;
+            padding: 6px;
+            margin: 4px;
+            border-radius: 4px;
+            border: #444 1px solid;
+            width: 80px;
+        }
+        a {
+            color: rgb(0, 127, 255);
+        }
+        pre {
+            background-color: #222;
+            width: fit-content;
+            padding: 12px;
+            border-radius: 4px;
+            border: #444 1px solid;
+            
+        }
+        button, .btn {
+            color: white;
+            padding: 8px;
+            background: rgb(0, 127, 255);
+            border-radius: 4px;
+            border: #444 1px solid;
+            margin: 4px;
+        }
+        button:hover, .btn:hover{
+            cursor: pointer;
+        }
+        .invis {
+            display: none;
+        }
+        .item {
+            background-color: #111;
+            padding: 12px;
+            border-radius: 8px;
+            border: #444 1px solid;
+            margin: 6px;
+        }
+        select {
+            all: unset;
+            background: #222;
+            color: white;
+            padding: 6px;
+            margin: 4px;
+            border-radius: 4px;
+            border: #444 1px solid;
+        }
+        h2{
+            margin-top: 24px;
+            margin-bottom: 0px;
+        }
+
+        @media (min-width: 1000px) {
+            .flex {
+                display: flex;/* Display as flex */
+                max-width: 100vw;
+                flex-wrap: wrap;
+            }
+
+        }
+    </style>
+</head>
+
+<body>
+    <div class="flex content">
+        <div class="item">
+            <h1>Options</h1>
+            <div class="fileselect select">
+                <H2>File Selections</H2>
+                <br>
+                    <label class="btn" for="gif">Choose GIF: </label><input class="file invis" type="file" id="gif" accept="image/gif">
+                    <label class="btn" for="png">Choose PNG: </label><input class="invis" type="file" id="png" accept="image/png">
+                <div class="btns"></div>
+            </div>
+            <h2>Dimensions</h2>
+            <div class="select">
+                <label for="inv_width">Width of GIF part: </label><input type="number" id="inv_width" value="176" min="1">
+                <label for="inv_height">Height of GIF part: </label><input type="number" id="inv_height" value="166" min="1">
+            </div>
+            <div class="select">
+                <label for="t_width">Width of ENTIRE Texture: </label><input type="number" id="t_width" value="256" min="1">
+                <label for="t_height">Height of ENTIRE Texture: </label><input type="number" id="t_height" value="256" min="1">
+            </div>
+            <H2>GIF Padding</H2>
+            <p class="warn">This does *NOT* change the height/wdith of the texture, only the posiiton of the GIF!</p>
+            <div class="select">
+                <label for="pad_top">Pad Top: </label><input type="number" id="pad_top" value="0" min="0">
+                <label for="pad_left">Pad Left: </label><input type="number" id="pad_left" value="0" min="0">
+            </div>
+            <H2>Frametime and Text Select</H2>
+            <div class="select">
+                <label for="ticks">(1-20) </label><input type="number" id="ticks" max="20" min="1" value="1">
+                <p><label for="type">Text Select: </label><select id="type">
+                        <option value="both" selected>show both .mcmeta and .properties</option>
+                        <option value="mcmeta">show .png.mcmeta</option>
+                        <option value="properties">show .properties</option>
+                    </select></p>
+            </div>
+                <H2>Buttons</H2>
+            <div class="reduce">
+                <button id="update_all_btn">Update ALL Outputs</button>
+                <button id="update_gif_btn">Update GIF</button>
+                <button id="overlay_png_btn">Overlay PNG</button>
+                <button id="update_texts_btn">Update Texts</button>
+                <button id="clear_btn">Clear Output</button>
+            </div>
+        </div>
+        <div class="item">
+            <h1>Output</h1>
+            <pre id="error" class="warn">Status Will Appear Here!</pre>
+            <H2>Current Files</H2>
+            <div class="files">
+                <p>GIF: <span class="warn" id="gifname"></span></p>
+                <p>PNG: <span class="warn" id="pngname"></span></p>
+            </div>
+            <h2 id="props">TEXTURENAME.properties <button id="download_props">Download .properties</button></h2>
+            <pre id="prop_out">tmp value</pre>
+            <h2 id="mcmeta">TEXTURENAME.png.mcmeta <button id="download_mcmeta">Download .png.mcmeta</button></h2>
+            <pre id="mcmeta_out">tmp value</pre>
+            
+            <h2>TEXTURENAME.png <button id="download_img">Download .png</button></h2>
+            <canvas id="output"></canvas>
+        </div>
+        <div class="item">
+            <h1>Info</h1>
+            <h2>Instructions</h2>
+            <p>Select a GIF to put under your overlay</p>
+            <p>Select a PNG to overlay over the GIF</p>
+            <p>Set GIF output dimensions</p>
+            <p>Set entire PNG/texture dimensions (minecraft supports powers of 2)</p>
+            <p>Set padding values (how many pixels the GIF should shift down/right)</p>
+            <p>Set tickspeed of the .properties and/or .mcmeta file</p>
+            <p>Click the "Update Output" Button</p>
+            <p>Download the files you need/want!</p>
+            <p>Click the "Clear Output" button when you want to clear the output!</p>
+            <p class="warn">This does *NOT* clear the uploaded files!</p>
+            <p>Repeat!</p>
+            <h2>Notes</h2>
+            <p>Some GIFs may have transparent frames that break, sorry!</p>
+            <p>use opaque PNGs to make weird shapes work!</p>
+            <p>"Update GIF" will also set the dimensions of the canvas</p>
+            <p>"Overylay PNG" will overlay your currently selected PNG onto the canvas</p>
+        </div>
+    </div>
+    <footer class="footer item">
+        <h1>About</h1>
+        <p>Uses <a href="https://www.npmjs.com/package/gif-frames">gif-frames</a>! - Thanks to <a href="https://gamepro5.github.io/">Gamepro5</a> for his MC pack info and idea for this! - You can read about animations in your mc packs on the Wiki Via; <a
+            href="https://minecraft.gamepedia.com/Resource_pack#Animation">these</a> <a
+            href="https://minecraft.gamepedia.com/Tutorials/Creating_a_resource_pack#Animation_Properties">articles</a>!</p>
+        <p>Modified to work with most animated usecases by XCRunnerS :3</p>
+        <p><a href="https://sheeptester.github.io/words-go-here/misc/animated-painting-maker.html">Original</a> Tool</p>
+    </footer>
+
+    <script>
+        // selectors
+        const gifSelector = document.getElementById("gif");
+        const pngSelector = document.getElementById("png");
+        // dimensions
+        const options = {
+            inv_width: document.getElementById("inv_width"),
+            inv_height: document.getElementById("inv_height"),
+
+            t_width: document.getElementById("t_width"),
+            t_height: document.getElementById("t_height"),
+
+            pad_top: document.getElementById("pad_top"),
+            pad_left: document.getElementById("pad_left"),
+
+            ticks: document.getElementById('ticks')
+        }
+        // outputs
+        const error = document.getElementById('error');
+        const output = document.getElementById('output');
+        const ctx = output.getContext('2d');
+        const prop_out = document.getElementById('prop_out');
+        const mcmeta_out = document.getElementById('mcmeta_out');
+        const gifname = document.getElementById('gifname');
+        const pngname = document.getElementById('pngname');
+
+        // buttons
+        const update_all_btn = document.getElementById('update_all_btn');
+        const update_gif_btn = document.getElementById('update_gif_btn');
+        const overlay_png_btn = document.getElementById('overlay_png_btn');
+        const update_texts_btn = document.getElementById('update_texts_btn');
+
+        const clear_btn = document.getElementById('clear_btn');
+        
+        const download_img = document.getElementById('download_img');
+        const download_props = document.getElementById('download_props');
+        const download_mcmeta = document.getElementById('download_mcmeta');
+
+        const hmcmeta = document.getElementById('mcmeta');
+        const hprops = document.getElementById('props');
+
+        const type = document.getElementById('type');
+        // values so that update_vars() can update them
+        let inv_width = +options.inv_width.value;
+        let inv_height = +options.inv_height.value;
+        let t_width = +options.t_width.value;
+        let t_height = +options.t_height.value;
+        let ticks = +options.ticks.value;
+        let pad_left = +options.pad_left.value;
+        let pad_top = +options.pad_top.value;
+
+        let selectedpng;
+        let selectedgif;
+
+        // other vars
+        let png;
+        let url;
+        let frames = null;
+
+        function load_gif(file) {
+                if (!file) return;
+                if (url) {
+                    URL.revokeObjectURL(url);
+                }
+                url = URL.createObjectURL(file);
+                load_frames();
+            }
+        function load_frames() {
+            if (!url) return;
+            gifFrames({
+                url,
+                frames: 'all',
+                outputType: 'canvas',
+                cumulative: true
+            }).then(frameData => {
+                frames = frameData.map(frame => frame.getImage());
+            });
+
+            }
+        function load_png(file) {
+            // Get the selected file from the pngSelector
+            // Check if a file was selected
+            if (file) {
+                // Use a FileReader to read the file as a data URL
+                const reader = new FileReader();
+
+                reader.onload = function (event) {
+                    png = new Image();
+                    // The result property contains the data URL of the selected file
+                    png.src = event.target.result;
+                };
+
+                reader.readAsDataURL(file);
+            }
+        }
+        function update_all() {
+            error.textContent = ' '
+            update_filenames()
+            
+            // set constants for easy use
+            update_vars()
+
+            update_gif()
+            overlay_png()
+            update_texts()
+
+            error.textContent += '\nLoaded!'
+        }
+
+        function update_gif() {
+            if (frames) {
+                // originally used the "cover" case
+                output.width = t_width;
+                output.height = t_height * frames.length;
+                frames.forEach((frame, i) => {
+                    let scale;
+                    if (frame.width / frame.height < inv_width / inv_height) {
+                        scale = inv_width / frame.width;
+                    }
+                    else {
+                        scale = inv_height / frame.height;
+                    }
+                    ctx.drawImage(
+                        frame,
+                        (frame.width - inv_width / scale) / 2,
+                        (frame.height - inv_height / scale) / 2,
+                        inv_width / scale,
+                        inv_height / scale,
+                        0 + pad_left,
+                        (i * t_height) + pad_top,
+                        inv_width,
+                        inv_height
+                    );
+                });
+                error.textContent += '\nLoaded GIF!'
+            }
+            else { error.textContent += '\nNo GIF Found!' }
+        }
+        function overlay_png() {
+            if (png) {
+                // Get a reference to your canvas element (assuming it has the id "canvas")
+
+                // Create an image element and set its source to the PNG data
+                let img = new Image();
+                img.src = png.src;
+                // Draw the image onto the canvas
+                img.onload = function () {
+                    var maxheight = (output.height - t_height);
+                    var curheight = 0;
+                    while (curheight <= maxheight) {
+                        ctx.drawImage(img, 0, curheight);
+                        curheight += Number(t_height)
+                    };
+                }
+                error.textContent += '\nOverlayed PNG!'
+            }
+            error.textContent += '\nNO PNG Found!'
+        }
+        function update_texts() {
+            update_filenames()
+            switch (type.value) {
+                case 'mcmeta': {
+                    hide_content(hprops)
+                    hide_content(prop_out)
+
+                    show_content(hmcmeta)
+                    show_content(mcmeta_out)
+                    break;
+                }
+                case 'properties': {
+                    hide_content(hmcmeta)
+                    hide_content(mcmeta_out)
+
+                    show_content(hprops)
+                    show_content(prop_out)
+                    break;
+                }
+                case 'both': {
+                    show_content(hmcmeta)
+                    show_content(mcmeta_out)
+                    show_content(hprops)
+                    show_content(prop_out)
+                    break;
+                }
+
+            }
+
+            var propcontent = "duration = " + ticks +
+                "\nh = " + t_height +
+                "\nw = " + t_width +
+                "\nx = 0" +
+                "\ny = 0" +
+                "\nfrom = ./TEXTURENAME.png" +
+                "\nto = textures/gui/container/inventory.png";
+
+            var metacontent = JSON.stringify({
+                animation: {
+                    frametime: ticks
+                }
+            }, null, 2);
+
+            prop_out.textContent = propcontent
+            mcmeta_out.textContent = metacontent
+            error.textContent += '\nLoaded Text Contents!'
+        }
+        function update_vars() {
+            
+            inv_width = +options.inv_width.value;
+            inv_height = +options.inv_height.value;
+            t_width = +options.t_width.value;
+            t_height = +options.t_height.value;
+            ticks = +options.ticks.value;
+            pad_left = +options.pad_left.value;
+            pad_top = +options.pad_top.value;
+        }
+
+        function clear_output() {
+            prop_out.textContent = 'tmp value';
+            mcmeta_out.textContent = 'tmp value';
+            ctx.clearRect(0, 0, output.width, output.height);
+            output.width = 16
+            output.height = 16
+            error.textContent = ' '
+            show_content(hprops)
+            show_content(prop_out)
+            show_content(hmcmeta)
+            show_content(mcmeta_out)
+        }
+        function hide_content(content) {
+            content.classList.add('invis')
+        }
+        function show_content(content) {
+            content.classList.remove('invis')
+        }
+        function update_filenames() {
+            if (selectedgif){
+                gifname.textContent = ''
+                gifname.textContent += selectedgif.name
+            }
+            if (selectedpng) {
+                pngname.textContent = ''
+                pngname.textContent += selectedpng.name
+            }
+        }
+
+        gifSelector.addEventListener('change', e => {
+            selectedgif = gifSelector.files[0]
+            load_gif(selectedgif);
+            update_filenames();
+        });
+        pngSelector.addEventListener("change", e => {
+            selectedpng = pngSelector.files[0]
+            load_png(selectedpng);
+            update_filenames();
+        });
+
+        download_img.addEventListener('click', e => {
+            output.toBlob(blob => {
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.download = 'TEXTURENAME.png';
+                link.href = url;
+                document.body.append(link);
+                link.click();
+                link.remove();
+                URL.revokeObjectURL(url);
+            });
+        });
+        download_props.addEventListener('click', e => {
+            var exporttext = prop_out.textContent
+            var blob = new Blob([exporttext]);
+
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+
+            link.download = 'TEXTURENAME.properties';
+            link.href = url;
+
+            document.body.append(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(url);
+        });
+        download_mcmeta.addEventListener('click', e => {
+                var exporttext = mcmeta_out.textContent
+                var blob = new Blob([exporttext]);
+
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+
+                link.download = 'TEXTURENAME.png.mcmeta';
+                link.href = url;
+
+                document.body.append(link);
+                link.click();
+                link.remove();
+                URL.revokeObjectURL(url);
+            });
+        
+        update_all_btn.addEventListener('click', e => {
+            error.textContent = ' '
+            update_all()
+        });
+        update_gif_btn.addEventListener('click', e => {
+            error.textContent = ' '
+            update_gif()
+        })
+        overlay_png_btn.addEventListener('click', e => {
+            error.textContent = ' '
+            overlay_png()
+        })
+        update_texts_btn.addEventListener('click', e => {
+            error.textContent = ' '
+            update_texts()
+        })
+        clear_btn.addEventListener('click', clear_output);
+        clear_output() // initially clear output
+    </script>
+</body>
+</html>
