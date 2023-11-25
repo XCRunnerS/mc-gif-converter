@@ -2,11 +2,11 @@
 <html lang="en">
 
 <head>
-    <title>MC GIF Porter V9</title>
+    <title>MC GIF Porter V10</title>
     <meta charset="UTF-8">
     <meta name="description" content="A bit hard to use; meant for those who know what they're doing." />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script src="https://unpkg.com/gif-frames@0.4.0/dist/gif-frames.min.js"></script>
+    <script src="https://unpkg.com/gif-frames@0.4.0/dist/gif-frames.min.js"></script> <!-- Loading gif stuff -->
     <style>
         .warn {
             color: yellow;
@@ -30,7 +30,7 @@
             width: 80px;
         }
         a {
-            color: rgb(0, 127, 255);
+            color: #08f;
         }
         pre {
             background-color: #222;
@@ -43,7 +43,7 @@
         button, .btn {
             color: white;
             padding: 8px;
-            background: rgb(0, 127, 255);
+            background: #08f;
             border-radius: 4px;
             border: #444 1px solid;
             margin: 4px;
@@ -74,11 +74,11 @@
             margin-top: 24px;
             margin-bottom: 0px;
         }
+        .widein {width: 70%;}
 
         @media (min-width: 1000px) {
             .flex {
                 display: flex;/* Display as flex */
-                max-width: 100vw;
                 flex-wrap: wrap;
             }
 
@@ -87,10 +87,10 @@
 </head>
 
 <body>
-    <div class="flex content">
+    <div class="flex">
         <div class="item">
             <h1>Options</h1>
-            <div class="fileselect select">
+            <div class="div">
                 <H2>File Selections</H2>
                 <br>
                     <label class="btn" for="gif">Choose GIF: </label><input class="file invis" type="file" id="gif" accept="image/gif">
@@ -98,50 +98,53 @@
                 <div class="btns"></div>
             </div>
             <h2>Dimensions</h2>
-            <div class="select">
+            <div class="div">
                 <label for="inv_width">Width of GIF part: </label><input type="number" id="inv_width" value="176" min="1">
                 <label for="inv_height">Height of GIF part: </label><input type="number" id="inv_height" value="166" min="1">
             </div>
-            <div class="select">
+            <div class="div">
                 <label for="t_width">Width of ENTIRE Texture: </label><input type="number" id="t_width" value="256" min="1">
                 <label for="t_height">Height of ENTIRE Texture: </label><input type="number" id="t_height" value="256" min="1">
             </div>
             <H2>GIF Padding</H2>
             <p class="warn">This does *NOT* change the height/wdith of the texture, only the posiiton of the GIF!</p>
-            <div class="select">
-                <label for="pad_top">Pad Top: </label><input type="number" id="pad_top" value="0" min="0">
-                <label for="pad_left">Pad Left: </label><input type="number" id="pad_left" value="0" min="0">
+            <div class="div">
+                <label for="pad_top">Padding Top: </label><input type="number" id="pad_top" value="0" min="0">
+                <label for="pad_left">Padding Left: </label><input type="number" id="pad_left" value="0" min="0">
             </div>
-            <H2>Frametime and Text Select</H2>
-            <div class="select">
+            <H2>Frametime + Text Select</H2>
+            <div class="div">
                 <label for="ticks">(1-20) </label><input type="number" id="ticks" max="20" min="1" value="1">
-                <p><label for="type">Text Select: </label><select id="type">
+                <label for="type">Text Select: </label><select id="type">
                         <option value="both" selected>show both .mcmeta and .properties</option>
                         <option value="mcmeta">show .png.mcmeta</option>
                         <option value="properties">show .properties</option>
-                    </select></p>
+                    </select>
+            </div>
+            <div class="div">
+                <label for="to_value_prop">.properties value: </label><input class="widein" type="text" id="prop_override_val" value="textures/gui/container/inventory.png"> <!-- Fuck this is rough -->
             </div>
                 <H2>Buttons</H2>
-            <div class="reduce">
-                <button id="update_all_btn">Update ALL Outputs</button>
+            <div>
+                <button id="update_all_btn">Update <b>ALL</b> Outputs</button>
                 <button id="update_gif_btn">Update GIF</button>
                 <button id="overlay_png_btn">Overlay PNG</button>
                 <button id="update_texts_btn">Update Texts</button>
-                <button id="clear_btn">Clear Output</button>
+                <button id="clear_btn">CLEAR <b>ALL</b> Outputs</button>
             </div>
         </div>
         <div class="item">
             <h1>Output</h1>
             <pre id="error" class="warn">Status Will Appear Here!</pre>
             <H2>Current Files</H2>
-            <div class="files">
+            <div class="div">
                 <p>GIF: <span class="warn" id="gifname"></span></p>
                 <p>PNG: <span class="warn" id="pngname"></span></p>
             </div>
             <h2 id="props">TEXTURENAME.properties <button id="download_props">Download .properties</button></h2>
-            <pre id="prop_out">tmp value</pre>
+            <pre id="prop_out"> </pre>
             <h2 id="mcmeta">TEXTURENAME.png.mcmeta <button id="download_mcmeta">Download .png.mcmeta</button></h2>
-            <pre id="mcmeta_out">tmp value</pre>
+            <pre id="mcmeta_out"> </pre>
             
             <h2>TEXTURENAME.png <button id="download_img">Download .png</button></h2>
             <canvas id="output"></canvas>
@@ -152,14 +155,13 @@
             <p>Select a GIF to put under your overlay</p>
             <p>Select a PNG to overlay over the GIF</p>
             <p>Set GIF output dimensions</p>
-            <p>Set entire PNG/texture dimensions (minecraft supports powers of 2)</p>
-            <p>Set padding values (how many pixels the GIF should shift down/right)</p>
-            <p>Set tickspeed of the .properties and/or .mcmeta file</p>
-            <p>Click the "Update Output" Button</p>
+            <p>Set entire PNG/texture dimensions (minecraft properly supports powers of 2)</p>
+            <p>Set padding values (how many pixels the GIF should be shifted down/right)</p>
+            <p>Set tickspeed/frametime of the .properties and/or .mcmeta file</p>
+            <p>Click the "Update <b>ALL</b> Outputs" Button</p>
             <p>Download the files you need/want!</p>
-            <p>Click the "Clear Output" button when you want to clear the output!</p>
-            <p class="warn">This does *NOT* clear the uploaded files!</p>
-            <p>Repeat!</p>
+            <p>Click the "Clear <b>ALL</b> Outputs" button when you want to clear the output!</p>
+            <p class="warn">"Clear <b>ALL</b> Outputs" does *NOT* clear the uploaded files!</p>
             <h2>Notes</h2>
             <p>Some GIFs may have transparent frames that break, sorry!</p>
             <p>use opaque PNGs to make weird shapes work!</p>
@@ -176,7 +178,8 @@
         <p><a href="https://sheeptester.github.io/words-go-here/misc/animated-painting-maker.html">Original</a> Tool</p>
     </footer>
 
-    <script>
+    <script>//main script
+        // vars
         // selectors
         const gifSelector = document.getElementById("gif");
         const pngSelector = document.getElementById("png");
@@ -201,15 +204,14 @@
         const mcmeta_out = document.getElementById('mcmeta_out');
         const gifname = document.getElementById('gifname');
         const pngname = document.getElementById('pngname');
-
+        const prop_override = document.getElementById('prop_override_val')
         // buttons
         const update_all_btn = document.getElementById('update_all_btn');
         const update_gif_btn = document.getElementById('update_gif_btn');
         const overlay_png_btn = document.getElementById('overlay_png_btn');
         const update_texts_btn = document.getElementById('update_texts_btn');
-
         const clear_btn = document.getElementById('clear_btn');
-        
+        // dl buttons
         const download_img = document.getElementById('download_img');
         const download_props = document.getElementById('download_props');
         const download_mcmeta = document.getElementById('download_mcmeta');
@@ -217,7 +219,8 @@
         const hmcmeta = document.getElementById('mcmeta');
         const hprops = document.getElementById('props');
 
-        const type = document.getElementById('type');
+        const type = document.getElementById('type'); // textselect (why the fuck did I name it this????)
+        
         // values so that update_vars() can update them
         let inv_width = +options.inv_width.value;
         let inv_height = +options.inv_height.value;
@@ -226,6 +229,7 @@
         let ticks = +options.ticks.value;
         let pad_left = +options.pad_left.value;
         let pad_top = +options.pad_top.value;
+        let prop_override_val = prop_override.value;
 
         let selectedpng;
         let selectedgif;
@@ -249,7 +253,7 @@
                 url,
                 frames: 'all',
                 outputType: 'canvas',
-                cumulative: true
+                cumulative: true // need 4 shitty gifs 2 work, disables transparent gifs tho
             }).then(frameData => {
                 frames = frameData.map(frame => frame.getImage());
             });
@@ -287,7 +291,6 @@
 
         function update_gif() {
             if (frames) {
-                // originally used the "cover" case
                 output.width = t_width;
                 output.height = t_height * frames.length;
                 frames.forEach((frame, i) => {
@@ -336,32 +339,7 @@
         }
         function update_texts() {
             update_filenames()
-            switch (type.value) {
-                case 'mcmeta': {
-                    hide_content(hprops)
-                    hide_content(prop_out)
-
-                    show_content(hmcmeta)
-                    show_content(mcmeta_out)
-                    break;
-                }
-                case 'properties': {
-                    hide_content(hmcmeta)
-                    hide_content(mcmeta_out)
-
-                    show_content(hprops)
-                    show_content(prop_out)
-                    break;
-                }
-                case 'both': {
-                    show_content(hmcmeta)
-                    show_content(mcmeta_out)
-                    show_content(hprops)
-                    show_content(prop_out)
-                    break;
-                }
-
-            }
+            update_vars()
 
             var propcontent = "duration = " + ticks +
                 "\nh = " + t_height +
@@ -369,7 +347,7 @@
                 "\nx = 0" +
                 "\ny = 0" +
                 "\nfrom = ./TEXTURENAME.png" +
-                "\nto = textures/gui/container/inventory.png";
+                "\nto = " + prop_override_val;
 
             var metacontent = JSON.stringify({
                 animation: {
@@ -390,11 +368,13 @@
             ticks = +options.ticks.value;
             pad_left = +options.pad_left.value;
             pad_top = +options.pad_top.value;
+
+            prop_override_val = prop_override.value;
         }
 
         function clear_output() {
-            prop_out.textContent = 'tmp value';
-            mcmeta_out.textContent = 'tmp value';
+            prop_out.textContent = ' ';
+            mcmeta_out.textContent = ' ';
             ctx.clearRect(0, 0, output.width, output.height);
             output.width = 16
             output.height = 16
@@ -431,6 +411,37 @@
             load_png(selectedpng);
             update_filenames();
         });
+
+        type.addEventListener('change', e => {
+            switch (type.value) {
+                case 'mcmeta': {
+                    hide_content(hprops)
+                    hide_content(prop_out)
+                    hide_content(prop_override)
+
+                    show_content(hmcmeta)
+                    show_content(mcmeta_out)
+                    break;
+                }
+                case 'properties': {
+                    hide_content(hmcmeta)
+                    hide_content(mcmeta_out)
+
+                    show_content(hprops)
+                    show_content(prop_override)
+                    show_content(prop_out)
+                    break;
+                }
+                case 'both': {
+                    show_content(hmcmeta)
+                    show_content(mcmeta_out)
+                    show_content(hprops)
+                    show_content(prop_out)
+                    show_content(prop_override)
+                    break;
+                }
+            }
+        })
 
         download_img.addEventListener('click', e => {
             output.toBlob(blob => {
@@ -474,7 +485,7 @@
                 link.remove();
                 URL.revokeObjectURL(url);
             });
-        
+
         update_all_btn.addEventListener('click', e => {
             error.textContent = ' '
             update_all()
@@ -492,7 +503,11 @@
             update_texts()
         })
         clear_btn.addEventListener('click', clear_output);
-        clear_output() // initially clear output
+
+        clear_output() // initially clear output :3
+    </script>
+    <script>// in case I want to add a different script (also for organization)
+    
     </script>
 </body>
 </html>
