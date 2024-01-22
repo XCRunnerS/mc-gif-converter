@@ -1,0 +1,91 @@
+.warn {
+    color: yellow;
+}
+
+body {
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    background: black;
+    color: white;
+    font-family: 'Open Sans', sans-serif;
+}
+
+input {
+    all: unset;
+    background: #222;
+    color: white;
+    padding: 6px;
+    margin: 4px;
+    border-radius: 4px;
+    border: #444 1px solid;
+    width: 80px;
+}
+
+a {
+    color: #08f;
+}
+
+pre {
+    background-color: #222;
+    width: fit-content;
+    padding: 12px;
+    border-radius: 4px;
+    border: #444 1px solid;
+
+}
+
+button,
+.btn {
+    color: white;
+    padding: 8px;
+    background: #08f;
+    border-radius: 4px;
+    border: #444 1px solid;
+    margin: 4px;
+}
+
+button:hover,
+.btn:hover {
+    cursor: pointer;
+}
+
+.invis {
+    display: none;
+}
+
+.item {
+    background-color: #111;
+    padding: 12px;
+    border-radius: 8px;
+    border: #444 1px solid;
+    margin: 6px;
+}
+
+select {
+    all: unset;
+    background: #222;
+    color: white;
+    padding: 6px;
+    margin: 4px;
+    border-radius: 4px;
+    border: #444 1px solid;
+}
+
+h2 {
+    margin-top: 24px;
+    margin-bottom: 0px;
+}
+
+.widein {
+    width: 70%;
+}
+
+@media (min-width: 1000px) {
+    .flex {
+        display: flex;
+        /* Display as flex */
+        flex-wrap: wrap;
+    }
+
+}
