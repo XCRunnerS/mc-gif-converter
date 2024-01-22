@@ -1,5 +1,8 @@
 # Changelog for mc-gif-converter
 
+## V11
+Split into 4 files, just open `autoinv.html` to run it
+
 ## V10
 
 - replace default values of `'tmp value'` with `' '`
